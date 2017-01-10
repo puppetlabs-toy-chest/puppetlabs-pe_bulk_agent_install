@@ -1,0 +1,151 @@
+# distrib_agent.ps1 : This powershell script uses WinRM to instruct Windows nodes on a network to install the Puppet agent
+[CmdletBinding()]
+
+Param(
+  [string]$Node          = $null,                            # Singular Agent install
+  [string]$Credential    = $null,                            # Windows credentials
+  [string]$FilePath      = 'nodes.txt',                      # File containing hostnames of nodes
+  [string]$LogPath       = 'pe_bulk_agent_install.log',      # Output from remote jobs
+  [string]$InstallScript = '<%= @script_name %>',            # Name of PS1 script on Puppet Master
+  [string]$InstallDest   = '<%= @scripts_install_location %>/<%= @script_name %>', # Script location
+  [string]$PMHostname    = '<%= @master %>'                  # Puppet Master Hostname
+)
+
+# Uncomment the following line to enable debugging messages
+# $DebugPreference = 'Continue'
+
+function Add-Remote-Trusted-Hosts {
+  if ((Get-Item wsman:\\localhost\Client\TrustedHosts).value -ne '*') {
+    Set-Item WSMan:\localhost\Client\TrustedHosts *
+  }
+}
+
+function Download-Agent-Install {
+  if (-not (Test-Path $InstallDest)) {
+    Write-Verbose "Downloading the Puppet agent install script to $env:COMPUTERNAME..."
+
+    $InstallSrc = "https://$PMHostname`:<%= @master_port %>/packages/current/$InstallScript"
+
+    [System.Net.ServicePointManager]::ServerCertificateValidationCallback={$true}
+    $webclient = New-Object system.net.webclient
+
+    try {
+      $webclient.DownloadFile($InstallSrc,$InstallDest)
+    }
+    catch [Net.WebException] {
+      Write-Warning "Failed to download the Puppet agent installer script: $InstallSrc"
+      Write-Warning "$_"
+    }
+  }
+}
+
+
+function Mass-Install-Puppet {
+  # If user doesn't supply comma separated list on command line
+  if ([string]::IsNullOrEmpty($Node)) {
+    if (Test-Path $FilePath) {
+      $node_list = Get-Content $FilePath
+    }
+    else {
+      Write-Error -Message "You must either pass -Node on the command line, -FilePath for a list of nodes in a file, or the nodes.txt file must exist." -Category InvalidArgument
+      Exit
+    }
+  }
+  else {
+    $node_list = $Node
+  }
+
+  # Clear stats
+  $completed = @()
+  $failed    = @()
+
+  # Clear all previous jobs
+  Get-Job | Remove-Job
+
+  $job_name = 'pe_bulk_agent_install'
+
+  # Create running failure log
+  $fail_msgs = ''
+
+  foreach ($node in $node_list) {
+    $nodeUp = $node.toUpper()
+
+    if (Test-Connection -Computername $node -Quiet) {
+      if (Test-WSMan -ComputerName $node -Authentication Default -ErrorAction Ignore) {
+        if ([string]::IsNullOrEmpty($Credential)) {
+          Invoke-Command -ComputerName $node -AsJob -JobName $job_name -FilePath $InstallDest
+        }
+        else {
+          Invoke-Command -ComputerName $node -AsJob -JobName $job_name -Credential $Credential -FilePath $InstallDest
+        }
+      }
+      else {
+        $fail_msgs += "`nUnable to connect to remote computer via WinRM: $nodeUp`n"
+        $failed += $node
+      }
+    }
+    else {
+      $fail_msgs += "`nUnable to contact remote computer: $nodeUp`n"
+      $failed += $node
+    }
+  }
+
+  While (Get-Job -State 'Running') {
+    cls
+    $jobs = Get-Job # | Select Location, State, Name | ConvertTo-Json
+    foreach ($job in $jobs) {
+      Write-Host $job.Location `t`t $job.State `t`t $job.Name
+    }
+    Start-Sleep -s 1
+  }
+
+  # Get final stats and report back
+  foreach ($job in (Get-Job)) {
+    if ($job.JobStateInfo.State -eq 'Failed') {
+      $failed += $job.Location
+    }
+    elseif ($job.JobStateInfo.State -eq 'Completed') {
+      $completed += $job.Location
+    }
+  }
+
+  Start-Transcript -Path $LogPath
+  Write-Output "`n"
+
+  foreach ($node in $completed) {
+    Write-Output "Ouput from job on $node..."
+    Get-Job | Receive-Job -Location $node
+    Write-Output "`n"
+  }
+  Write-Output "`n"
+
+  if ($fail_msgs.length -gt 0) {
+    Write-Warning $fail_msgs
+  }
+
+  Stop-Transcript
+  Remove-Job *
+  cls
+
+  Write-Host "PE Bulk Agent installer report`n"
+
+  Write-Host "Nodes Completed:" $completed.length
+  foreach ($node in $completed) {
+    Write-Host $node
+  }
+
+  Write-Host "`n"
+
+  Write-Host "Nodes Failed:" $failed.length
+  foreach ($node in $failed) {
+    Write-Host $node
+  }
+
+  Write-Host "`n`n`View $LogPath for details"
+
+}
+
+Add-Remote-Trusted-Hosts
+Download-Agent-Install
+Mass-Install-Puppet
+

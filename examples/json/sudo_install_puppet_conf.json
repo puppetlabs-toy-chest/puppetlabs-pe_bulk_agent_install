@@ -1,0 +1,7 @@
+{
+  "username": "vagrant",
+  "ssh_key_file": "/root/private_key.rsa",
+  "master" : "pe-201620-master",
+  "arguments" :
+    {"agent": { "environment": "development" }}
+}

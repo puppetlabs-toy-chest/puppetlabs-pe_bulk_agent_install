@@ -1,0 +1,5 @@
+{
+  "username": "vagrant",
+  "sudo_password": "vagrant",
+  "master" : "pe-201620-master"
+}
