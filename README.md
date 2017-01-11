@@ -49,7 +49,7 @@ The goal of this module is to accomplish the following tasks, en masee, on Linux
 
 ## Command Line Usage
 
-This module ships a puppet face `puppet bulk install`, it can be used with any
+This module ships a Puppet face `puppet bulk install`, it can be used with any
 system that supports ssh to allow for the mass installation of agent nodes using
 the simplified installer bundled with Puppet Enterprise.
 
@@ -59,7 +59,7 @@ For Windows nodes, a separate method that uses a PowerShell script should be use
 
 ## Installation
 
-The puppet face requires the [chloride](https://rubygems.org/gems/chloride) gem to be in place in the puppet ruby stack (not puppetserver).
+The Puppet face requires the [chloride](https://rubygems.org/gems/chloride) gem to be in place in the Puppet ruby stack (not puppetserver).
 
 This gem can be installed manually with the following command:
 
@@ -69,7 +69,7 @@ This gem can be installed manually with the following command:
 
 > Future versions of Puppet Enterprise will likely ship with this gem see: [PE-17084](https://tickets.puppetlabs.com/browse/PE-17084)
 
-This can be automatically installed via puppet with the following code:
+This can be automatically installed via Puppet with the following code:
 
 ```puppet
 package {'chloride':
