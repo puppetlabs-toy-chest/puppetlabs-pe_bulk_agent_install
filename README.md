@@ -52,11 +52,11 @@ the simplified installer bundled with Puppet Enterprise.
 
 See the [Command Line Options](#command-line-options) section for option flags that can be passed to the CLI.
 
-For windows a powershell script is provided and configured via the module's classes
+For Windows nodes, a separate method that uses a PowerShell script should be used: [Windows docs](#windows)
 
 ## Installation
 
-The puppet face requires the [chloride](https://rubygems.org/gems/chloride) gem to be in place in the puppet ruby stack (not puppetserver).This gem only needs to be installed on the bastion host performing the command line operations.
+The puppet face requires the [chloride](https://rubygems.org/gems/chloride) gem to be in place in the puppet ruby stack (not puppetserver).
 
 This gem can be installed manually with the following command:
 
@@ -223,19 +223,37 @@ This will download the `setup_prerequisites.sh` script to the soon-to-be agent a
 
 ### Setup
 
+To use this module for Windows agents, things are a bit different, and you'll need to setup some prerequisites first. You'll need:
+
+1. An existing Windows agent that will act as your Windows bastion.
+1. WinRM configured on the Windows bastion and your soon-to-be Windows agents.
+
+> Note: Configuration of WinRM is out-of-scope for this module at this time and must be manually setup prior to attempting to use this tool. This link may help: <https://msdn.microsoft.com/en-us/library/aa384372(v=vs.85).aspx>
+
+This module comes with a PowerShell script, called `Invoke-PuppetAgentInstall.ps1` that will connect to Windows nodes via WinRM and execute
+the standard [Simplified Agent installer for Windows](https://docs.puppet.com/pe/latest/install_windows.html#installing-with-pe-package-management)
+that comes bundled with Puppet Enterprise. This script is what you will run to install Puppet on your Windows nodes.
+
+To prepare a Windows node to be the Bastion, follow these steps, choosing the correct set based on your version of Puppet Enterprise:
+
 #### PE 2016.3.x and higher
 
-1. Apply the `pe_repo::platform::windows_<arch>` class to the Puppet master and run Puppet. This will stage the MSI agent installer as well as the `install.ps1` PowerShell install script.
-
-1. Apply the `pe_bulk_agent_install::windows::bastion` class to the bastion host you wish to install the PowerShell bulk agent install scripts to.
+1. Apply the `pe_repo::platform::windows_<arch>` class to the Puppet master and run Puppet. This will prepare the Puppet agent MSI package and the Simplified Agent Installer for Windows.
+1. Apply the `pe_bulk_agent_install::windows::bastion` class to the Windows bastion server. This creates the WinRM installer script (by default, at `C:\Windows\Temp\Invoke-PuppetAgentInstall.ps1`).
 
 #### PE 2016.2.x and lower
 
-1. Apply the `pe_bulk_agent_install::windows::master` class to the Puppet master and run Puppet. This will stage the MSI agent installer as well as the `install.ps1` PowerShell install script.
+1. Apply the `pe_repo::platform::windows_<arch>` class to the Puppet master and run Puppet. This will prepare the Puppet agent MSI package.
+1. Apply the `pe_bulk_agent_install::windows::master` class to the Puppet master and run Puppet. This will prepare a copy of the Simplified Agent Installer for Windows.
+1. Apply the `pe_bulk_agent_install::windows::bastion` class to the Windows bastion server. This creates the WinRM installer script (by default, at `C:\Windows\Temp\Invoke-PuppetAgentInstall.ps1`).
 
-1. Apply the `pe_bulk_agent_install::windows::bastion` class to the bastion host you wish to install the PowerShell bulk agent install scripts to.
+> Note: The Simplified Agent Installer for Windows was added in PE 2016.3.0, hence the additional step for older versions.
 
 ### Usage
+
+Below are examples of using the `Invoke-PuppetAgentInstall.ps1` script in various scenarios.
+
+See the [`pe_bulk_agent_install::windows::bastion` class documentation](#pe_bulk_agent_installwindowsbastion) for how to customize the WinRM installer script.
 
 #### Single-agent
 
@@ -255,7 +273,7 @@ Credentials associated with a Windows user account.
 
 #### Multiple agents (using agents.txt)
 
-Placing the FQDN of each of the respective agents in a file called agents.txt in the working directory where the distrib_agent.ps1 executable will be run.
+Placing the FQDN of each of the respective agents in a file called `agents.txt` in the same directory as the script.
 
 ```PowerShell
 .\Invoke-PuppetAgentInstall.ps1 -PMHostname master.puppet.vm
@@ -263,7 +281,7 @@ Placing the FQDN of each of the respective agents in a file called agents.txt in
 
 #### Multiple agents (using provided file)
 
-Placing the FQDN of each of the respective agents in a file and file path of your choosing then referencing said path with the FilePath argument.
+Placing the FQDN of each of the respective agents in a file of your choosing then referencing said file with the `FilePath` argument.
 
 ```PowerShell
 .\Invoke-PuppetAgentInstall.ps1 -FilePath C:\ProgramData\nodes_list.txt -PMHostname master.puppet.vm
@@ -335,35 +353,35 @@ The relative or absolute path to a new line separated file containing node names
 ### `pe_bulk_agent_install::windows::bastion`
 
 This class is expected to be installed on a Windows node that has had Puppet
-manually installed. This "bastion" host will the node that will connect to unprovisioned Windows nodes.
+manually installed. This "bastion" host will connect to unprovisioned Windows nodes.
 
-### `master`
+#### `master`
 
 * Type: `String`
 * Default: `$::settings::server`
 
 The hostname of the Puppet master where the client will register its certificate.
 
-### `master_port`
+#### `master_port`
 
 * Type: `Integer[0,65535]`
 * Default: `8140`
 
 The port number that puppetserver is listening on.
 
-### `script_name`
-
-* Type: `String`
-* Default: `install.ps1`
-
-The filename of the agent install script that gets put on the bastion.
-
-### `scripts_install_location`
+#### `scripts_install_location`
 
 * Type: `String`
 * Default: `C:/Windows/Temp`
 
-The directory to store the agent install script on the bastion.
+The directory to put the `Invoke-PuppetAgentInstall.ps1` WinRM install script on the Windows bastion.
+
+#### `script_name`
+
+* Type: `String`
+* Default: `install.ps1`
+
+The name of the simplified agent install script Invoke-PuppetAgentInstall will attempt to execute.
 
 ---
 
