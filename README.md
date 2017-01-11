@@ -28,7 +28,6 @@ Professional Services toolkit for installing Puppet Enterprise agents in bulk
   * [Caveats](#caveats)
     * [Domain Member vs Standalone System](#domain-member-vs-standalone-system)
     * [Windows Bastion](#windows-bastion)
-* [Expectations](#expectations)
 * [Command Line Options](#command-line-options)
 * [Class Usage](#class-usage)
   * [pe\_bulk\_agent\_install::windows::bastion](#pe_bulk_agent_installwindowsbastion)
@@ -40,9 +39,13 @@ Professional Services toolkit for installing Puppet Enterprise agents in bulk
 
 ## Overview
 
-This module is used to build installation scripts for doing bulk installs of Puppet Agents on Linux and Windows machines with Puppet Enterprise.
+This module is used for bulk installs of Puppet Agents on Linux and Windows machines with Puppet Enterprise. It builds on the standard
+Simplified Agent Installation process that comes with Puppet Enterprise.
 
-It builds on the original curl to bash installation method available on the master
+The goal of this module is to accomplish the following tasks, en masee, on Linux and Windows nodes:
+
+* Install the Puppet agent
+* Start the Puppet Agent
 
 ## Command Line Usage
 
@@ -300,12 +303,6 @@ If this is not a desired result, at the completion of the distributed install sc
 
 [Use PowerShell to clear the Trusted Hosts file](https://blogs.technet.microsoft.com/heyscriptingguy/2013/11/29/powertip-use-powershell-to-clear-the-trusted-hosts-file/)
 
-## Expectations
-
-In all cases, these scripts will:
-
-* Install the appropriate Puppet Agent
-* Start the Puppet Agent
 
 ---
 
@@ -377,8 +374,6 @@ The directory to put the `Invoke-PuppetAgentInstall.ps1` WinRM install script on
 * Default: `install.ps1`
 
 The name of the simplified agent install script Invoke-PuppetAgentInstall will attempt to execute.
-
----
 
 ## Limitations
 
