@@ -202,26 +202,21 @@ to the bash installer as `section:key=value` arguments to `-s`
 Ideally your environment will have correct DNS and Time synchronized ahead of
 the Puppet Enterprise installation by way of your preseed/kickstart/sysprep
 provisioning process. In the event that you need to update this information,
-you can pass execute this face with an alternate script on the master.
+you can have the bulk install tool copy a script to the agent and execute it
+before installing Puppet. That script could setup DNS and NTP.
 
-```json
-{
-  "username": "root",
-  "ssh_key_file": "/vagrant/examples/vagrant.rsa",
-  "master" : "10.0.1.1",
-}
-```
+Use the `--script` option of the CLI to do this as shown below.
 
 ```shell
 sudo puppet bulk install \
---nodes /vagrant/examples/el_nodes.txt \
---credentials /vagrant/examples/json/sudo_install.json \
+--nodes el_nodes.txt \
+--credentials sudo_install.json \
 --debug
---script 'validate_install.sh'
+--script 'setup_prerequisites.sh'
 ```
 
-This will download the preflight.sh script using your master's ip address and
-execute it. An example of this script is located in the files directory,
+This will download the `setup_prerequisites.sh` script to the soon-to-be agent and execute it.
+
 > Note at the time of this writing you may need to build a custom wrapper script to pass this script arguments.
 
 ## Windows
