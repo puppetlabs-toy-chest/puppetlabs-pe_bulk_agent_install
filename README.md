@@ -225,16 +225,17 @@ This will download the `setup_prerequisites.sh` script to the soon-to-be agent a
 
 To use this module for Windows agents, things are a bit different, and you'll need to setup some prerequisites first. You'll need:
 
-1. An existing Windows agent that will act as your Windows bastion.
+1. An existing Windows agent that will act as a Windows bastion.
 1. WinRM configured on the Windows bastion and your soon-to-be Windows agents.
 
 > Note: Configuration of WinRM is out-of-scope for this module at this time and must be manually setup prior to attempting to use this tool. This link may help: <https://msdn.microsoft.com/en-us/library/aa384372(v=vs.85).aspx>
 
 This module comes with a PowerShell script, called `Invoke-PuppetAgentInstall.ps1` that will connect to Windows nodes via WinRM and execute
 the standard [Simplified Agent installer for Windows](https://docs.puppet.com/pe/latest/install_windows.html#installing-with-pe-package-management)
-that comes bundled with Puppet Enterprise. This script is what you will run to install Puppet on your Windows nodes.
+that comes bundled with Puppet Enterprise. The `Invoke-PuppetAgentInstall.ps1` script is managed on the Windows bastion with the
+`pe_bulk_agent_install::windows::bastion` class.
 
-To prepare a Windows node to be the Bastion, follow these steps, choosing the correct set based on your version of Puppet Enterprise:
+To prepare a Windows bastion, follow these steps, choosing the correct set based on your version of Puppet Enterprise:
 
 #### PE 2016.3.x and higher
 
@@ -253,7 +254,9 @@ To prepare a Windows node to be the Bastion, follow these steps, choosing the co
 
 Below are examples of using the `Invoke-PuppetAgentInstall.ps1` script in various scenarios.
 
-See the [`pe_bulk_agent_install::windows::bastion` class documentation](#pe_bulk_agent_installwindowsbastion) for how to customize the WinRM installer script.
+See the `pe_bulk_agent_install::windows::bastion` [class documentation](#pe_bulk_agent_installwindowsbastion) for how to customize the Windows bastion.
+
+See the WinRM Install Script documentation for options that can be passed into the script.
 
 #### Single-agent
 
@@ -296,14 +299,6 @@ Regardless if the system running the remote script is a domain member or a stand
 If this is not a desired result, at the completion of the distributed install script execution you can clean out the [Trusted Hosts](https://msdn.microsoft.com/en-us/library/aa384372.aspx) file.  One method to complete this task programmatically is as follows:
 
 [Use PowerShell to clear the Trusted Hosts file](https://blogs.technet.microsoft.com/heyscriptingguy/2013/11/29/powertip-use-powershell-to-clear-the-trusted-hosts-file/)
-
-#### Windows Bastion
-
-If the goal is to bulk install Windows agents, you will want to setup a Windows system purely for contacting other systems via [WinRM](https://msdn.microsoft.com/en-us/library/aa384426.aspx).
-
-Post creation of said system, you will want to install an agent as you would traditionally or with the [`pe_install_ps1`](https://github.com/natemccurdy/puppet-pe_install_ps1) module as used by this bulk windows agent installer.
-
-Once the agent is installed, it is time to classify the Windows distribution system with the class below:
 
 ## Expectations
 
