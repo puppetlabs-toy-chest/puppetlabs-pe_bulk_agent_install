@@ -66,7 +66,7 @@ This gem can be installed manually with the following command:
 This can be automatically installed via puppet with the following code:
 
 ```puppet
-package {'net-scp':
+package {'chloride':
   ensure   => 'present',
   provider => 'puppet_gem',
 }
