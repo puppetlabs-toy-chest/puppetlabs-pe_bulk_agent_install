@@ -22,9 +22,9 @@ Puppet::Face.define(:bulk, '1.0.0') do
     summary "Perform a bulk agent installation"
     arguments "<node> [<node> ...]"
     description <<-DESC
-      This face performs a bulk agent install by triggering a simplified (curl|bash) install
-      On the given node set.
-      DESC
+      This face performs a bulk agent install by triggering a simplified
+      (curl|bash) install on the given node set.
+    DESC
 
     option "--credentials=" do
       summary "A JSON file that contains the bulk agent configuration"
