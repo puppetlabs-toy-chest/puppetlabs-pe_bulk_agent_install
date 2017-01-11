@@ -33,7 +33,7 @@ Puppet::Face.define(:bulk, '1.0.0') do
     end
 
     option "--sudo" do
-      summary "Use sudo to run commands on remote systems"
+      summary "Use sudo to run commands on remote systems. Sudo is automatically used if the credentials hash contains a `sudo_password` key or a non root username"
     end
 
     option "--threads=" do
@@ -69,6 +69,13 @@ Puppet::Face.define(:bulk, '1.0.0') do
       Puppet.debug("Nodes:#{nodes}")
       Puppet.debug("Options: #{options}")
 
+      if (@config.key?(:sudo_password)) || (@config[:username] != 'root')
+        use_sudo = true
+        Puppet.debug("Using sudo to run the Puppet install script")
+      else
+        use_sudo = options[:sudo]
+      end
+
       raise ArgumentError, "Please provide at least one node via arg or [--nodes NODES_FILE]" if nodes.empty?
 
       thread_count    = options[:threads].to_i
@@ -95,7 +102,7 @@ Puppet::Face.define(:bulk, '1.0.0') do
               bash_arguments = @config[:arguments].map{|k,v| "#{v.map{|_k,_v| "%s:%s=%s" % [k,_k,_v]}.join(" ")}"}.unshift("-s").join(" ") unless @config[:arguments].nil?
               install = Chloride::Action::Execute.new(
                 :host => node,
-                :sudo => options[:sudo],
+                :sudo => use_sudo,
                 :cmd  => "bash -c \"curl -k https://#{@config[:master]}:8140/packages/current/#{options[:script]} | bash #{bash_arguments}\"")
                install.go do |event|
                  event.data[:messages].each do |data|
