@@ -29,6 +29,7 @@ Professional Services toolkit for installing Puppet Enterprise agents in bulk
     * [Domain Member vs Standalone System](#domain-member-vs-standalone-system)
     * [Windows Bastion](#windows-bastion)
 * [Expectations](#expectations)
+* [Command Line Options](#command-line-options)
 * [Class Usage](#class-usage)
   * [pe\_bulk\_agent\_install::windows::bastion](#pe_bulk_agent_installwindowsbastion)
 * [Limitations](#limitations)
@@ -49,7 +50,9 @@ This module ships a puppet face `puppet bulk install`, it can be used with any
 system that supports ssh to allow for the mass installation of agent nodes using
 the simplified installer bundled with Puppet Enterprise.
 
-For windows a powershell script is provided  and configured via the modules classes
+See the [Command Line Options](#command-line-options) section for option flags that can be passed to the CLI.
+
+For windows a powershell script is provided and configured via the module's classes
 
 ## Installation
 
@@ -120,7 +123,6 @@ in via STDIN. I.e. you can ping the nodes and only echo them if they respond.
 
 `puppet bulk install` supports a `--threads` argument which defaults to the number of processors on the bastion host times 2.
 You can increase or decrease this to control the load on your masters and bastion host running the ssh sessions.
-
 
 ## Credentials
 
@@ -237,6 +239,7 @@ execute it. An example of this script is located in the files directory,
 1. Apply the `pe_bulk_agent_install::windows::master` class to the Puppet master and run Puppet. This will stage the MSI agent installer as well as the `install.ps1` PowerShell install script.
 
 1. Apply the `pe_bulk_agent_install::windows::bastion` class to the bastion host you wish to install the PowerShell bulk agent install scripts to.
+
 ### Usage
 
 #### Single-agent
@@ -297,6 +300,40 @@ In all cases, these scripts will:
 * Start the Puppet Agent
 
 ---
+
+## Command Line Options
+
+The bulk installer accepts options from the command line as shown below.
+
+### `--credentials=`
+
+The relative or absolute path to a JSON file containing the credentials information.
+
+* Default: `bulk_install.json`
+
+### `--sudo`
+
+A boolean flag that specifies weather or not to run the installation scripts with `sudo` on Linux/Unix hosts.
+
+Sudo is automatically used if the credentials hash contains a `sudo_password` key or a non root username.
+
+### `--threads=`
+
+The number of threads to use for concurrent agent installations.
+
+* Default: Number of processors times 2.
+
+### `--script=`
+
+The name of the Puppet Enterprise agent installation script to run by default.
+
+* Default: `install.bash`
+
+### `--nodes=`
+
+The relative or absolute path to a new line separated file containing node names to install Puppet on.
+
+* Default: `nodes.txt`
 
 ## Class Usage
 
