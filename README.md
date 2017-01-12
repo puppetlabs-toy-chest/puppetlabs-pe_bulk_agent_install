@@ -1,6 +1,6 @@
 # PE Bulk Agent Install
 
-Professional Services toolkit for installing Puppet Enterprise agents in bulk
+Puppet toolkit for rapidly installing Puppet agents in Puppet Enterprise
 
 ## Table of Contents
 
@@ -42,7 +42,7 @@ Professional Services toolkit for installing Puppet Enterprise agents in bulk
 This module is used for bulk installs of Puppet Agents on Linux and Windows machines with Puppet Enterprise. It builds on the standard
 Simplified Agent Installation process that comes with Puppet Enterprise.
 
-The goal of this module is to accomplish the following tasks, en masee, on Linux and Windows nodes:
+The goal of this module is to accomplish the following tasks, rapidly and remotely, on Linux and Windows nodes:
 
 * Install the Puppet agent
 * Start the Puppet Agent
