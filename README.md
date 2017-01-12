@@ -27,10 +27,11 @@ Puppet toolkit for rapidly installing Puppet agents in Puppet Enterprise
     * [Multiple agents (using provided file)](#multiple-agents-using-provided-file)
   * [Caveats](#caveats)
     * [Domain Member vs Standalone System](#domain-member-vs-standalone-system)
-    * [Windows Bastion](#windows-bastion)
-* [Command Line Options](#command-line-options)
-* [Class Usage](#class-usage)
-  * [pe\_bulk\_agent\_install::windows::bastion](#pe_bulk_agent_installwindowsbastion)
+* [Reference](#reference)
+  * [Command Line Options](#command-line-options)
+  * [Class Usage](#class-usage)
+    * [pe\_bulk\_agent\_install::windows::bastion](#pe_bulk_agent_installwindowsbastion)
+  * [WinRM Script Arguments](#winrm-script-arguments)
 * [Limitations](#limitations)
 * [Development](#development)
 * [Contributors](#contributors)
@@ -268,7 +269,7 @@ Below are examples of using the `Invoke-PuppetAgentInstall.ps1` script in variou
 
 See the `pe_bulk_agent_install::windows::bastion` [class documentation](#pe_bulk_agent_installwindowsbastion) for how to customize the Windows bastion.
 
-See the WinRM Install Script documentation for options that can be passed into the script.
+See the WinRM Install Script [documentation](#winrm-script-arguments) for options that can be passed into the script.
 
 #### Single-agent
 
@@ -314,74 +315,133 @@ If this is not a desired result, at the completion of the distributed install sc
 
 ---
 
-## Command Line Options
+## Reference
 
-The bulk installer accepts options from the command line as shown below.
+### Command Line Options
 
-### `--credentials=`
+The bulk installer face accepts options from the command line as shown below.
+
+#### `--credentials=`
 
 The relative or absolute path to a JSON file containing the credentials information.
 
 * Default: `bulk_install.json`
 
-### `--sudo`
+#### `--sudo`
 
 A boolean flag that specifies weather or not to run the installation scripts with `sudo` on Linux/Unix hosts.
 
 Sudo is automatically used if the credentials hash contains a `sudo_password` key or a non root username.
 
-### `--threads=`
+#### `--threads=`
 
 The number of threads to use for concurrent agent installations.
 
 * Default: Number of processors times 2.
 
-### `--script=`
+#### `--script=`
 
 The name of the Puppet Enterprise agent installation script to run by default.
 
 * Default: `install.bash`
 
-### `--nodes=`
+#### `--nodes=`
 
 The relative or absolute path to a new line separated file containing node names to install Puppet on.
 
 * Default: `nodes.txt`
 
-## Class Usage
+### Class Usage
 
-### `pe_bulk_agent_install::windows::bastion`
+#### `pe_bulk_agent_install::windows::bastion`
 
 This class is expected to be installed on a Windows node that has had Puppet
 manually installed. This "bastion" host will connect to unprovisioned Windows nodes.
 
-#### `master`
+##### `master`
 
 * Type: `String`
 * Default: `$::settings::server`
 
 The hostname of the Puppet master where the client will register its certificate.
 
-#### `master_port`
+##### `master_port`
 
 * Type: `Integer[0,65535]`
 * Default: `8140`
 
 The port number that puppetserver is listening on.
 
-#### `scripts_install_location`
+##### `scripts_install_location`
 
 * Type: `String`
 * Default: `C:/Windows/Temp`
 
 The directory to put the `Invoke-PuppetAgentInstall.ps1` WinRM install script on the Windows bastion.
 
-#### `script_name`
+##### `script_name`
 
 * Type: `String`
 * Default: `install.ps1`
 
 The name of the simplified agent install script Invoke-PuppetAgentInstall will attempt to execute.
+
+### WinRM Script Arguments
+
+The WinRM script, `Invoke-PuppetAgentInstall.ps1`, accepts the following command line arguments.
+
+#### `Node`
+
+A comma-separated list of node names to install Puppet on. The node names must be resolvable by the Windows bastion running this script.
+
+Mutually exclusive with the `FilePath` argument.
+
+* Type: `String`
+* Default: `$null`
+
+#### `Credential`
+
+The username used to authenticate to the unprovisioned Windows agent.
+
+* Type: `String`
+* Default: `$null`
+
+#### `FilePath`
+
+The relative or absolute path to a new-line separated file containing node names to install Puppet on.
+
+Mutually exclusive with the `Node` argument.
+
+* Type: `String`
+* Default: `nodes.txt`
+
+#### `LogPath`
+
+The relative or absolute path to the log file used by this script.
+
+* Type: `String`
+* Default: `pe_bulk_agent_install.log`
+
+#### `InstallScript`
+
+The name of the Simplified Agent Install script on the Puppet master.
+
+* Type: `String`
+* Default: `install.ps1`
+
+#### `InstallDest`
+
+The full path to where the Simplified Agent Install script will be copied to the unprovisioned Windows agent.
+
+* Type: `String`
+* Default: `C:\Windows\Temp\install.ps1`
+
+#### `PMHostname`
+
+The FQDN of the Puppet Master that the Windows agent will communicate with.
+
+* Type: `String`
+* Default: The FQDN of the Puppet Master that manages the Windows bastion
 
 ## Limitations
 
