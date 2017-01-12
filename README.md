@@ -5,6 +5,7 @@ Puppet toolkit for rapidly installing Puppet agents in Puppet Enterprise
 ## Table of Contents
 
 * [Overview](#overview)
+* [Module State](#module-state)
 * [Command Line Usage](#command-line-usage)
 * [Installation](#installation)
 * [Simple SSH agent deployment](#simple-ssh-agent-deployment)
@@ -33,8 +34,7 @@ Puppet toolkit for rapidly installing Puppet agents in Puppet Enterprise
     * [pe\_bulk\_agent\_install::windows::bastion](#pe_bulk_agent_installwindowsbastion)
   * [WinRM Script Arguments](#winrm-script-arguments)
 * [Limitations](#limitations)
-* [Development](#development)
-* [Contributors](#contributors)
+* [Maintainers](#maintainers)
 
 ---
 
@@ -47,6 +47,12 @@ The goal of this module is to accomplish the following tasks, rapidly and remote
 
 * Install the Puppet agent
 * Start the Puppet Agent
+
+## Module State
+
+**NOTE:** This module started as a Puppet Professional Services toolkit. It is a side project, and it is currently neither officially
+maintained nor officially supported by Puppet, Inc. It may not function as expected; however, it is actively used in the wild so issues
+are likely to be resolved if found and reported. Have fun!
 
 ## Command Line Usage
 
@@ -443,21 +449,11 @@ The FQDN of the Puppet Master that the Windows agent will communicate with.
 * Type: `String`
 * Default: The FQDN of the Puppet Master that manages the Windows bastion
 
-## Limitations
+## Maintainers
 
-This is still considered pre-alpha, technical toolkit.
+This repository is largely the work of the Puppet Professional Services team. It is not officially maintained by Puppet, or any
+individual in particular. Issues should be opened in GitHub. Questions should be directed at the individuals responsible for
+committing that particular code.
 
-## Development
-
-Currently, contributions for this module are only accepted from internal Customer Success team members within Puppet and affiliate partners.
-
-## Contributors
-
-* [Paul Anderson](https://github.com/hpcprofessional)
-* [Andrew Brader](https://github.com/abrader)
-* [Trev Harmon](https://github.com/trevharmon)
-* [Brandon High](https://github.com/highb)
-* [Troy Klein](https://github.com/spidersddd)
-* [Nate McCurdy](https://github.com/natemccurdy)
-* [Zack Smith](https://github.com/acidprime)
+The list of contributors to this module can be found here: <https://github.com/puppetlabs/puppet-pe_bulk_agent_install/graphs/contributors>
 
