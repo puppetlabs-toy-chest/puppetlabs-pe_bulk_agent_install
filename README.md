@@ -49,19 +49,21 @@ The goal of this module is to accomplish the following tasks, en masee, on Linux
 
 ## Command Line Usage
 
-This module ships a Puppet face `puppet bulk install`, it can be used with any
-system that supports ssh to allow for the mass installation of agent nodes using
+This module ships a Puppet face, `puppet bulk install`. The face can be used with any
+system that supports SSH to allow for the mass installation of Puppet agent nodes using
 the simplified installer bundled with Puppet Enterprise.
 
-See the [Command Line Options](#command-line-options) section for option flags that can be passed to the CLI.
+See the [Command Line Options](#command-line-options) section for flags that can be passed to the CLI.
 
-For Windows nodes, a separate method that uses a PowerShell script should be used: [Windows docs](#windows)
+For Windows nodes, a separate method that uses a PowerShell script should be used. See [the docs here](#windows).
 
 ## Installation
 
-The Puppet face requires the [chloride](https://rubygems.org/gems/chloride) gem to be in place in the Puppet ruby stack (not puppetserver).
+The Puppet face requires the [chloride](https://rubygems.org/gems/chloride) gem to be in place in the Puppet ruby stack (not puppetserver)
+of the node that will be executing the Puppet face. This could be your Puppet master or some other Puppet agent that is able to connect
+to the soon-to-be Puppet agents.
 
-This gem can be installed manually with the following command:
+Install the gem manually with the following shell command:
 
 ```shell
 /opt/puppetlabs/puppet/bin/gem install chloride --no-ri --no-rdoc
@@ -69,7 +71,7 @@ This gem can be installed manually with the following command:
 
 > Future versions of Puppet Enterprise will likely ship with this gem see: [PE-17084](https://tickets.puppetlabs.com/browse/PE-17084)
 
-This can be automatically installed via Puppet with the following code:
+The gem can also be installed via Puppet with the following code:
 
 ```puppet
 package {'chloride':
@@ -80,24 +82,31 @@ package {'chloride':
 
 > This should be incorporated into this module at a later date
 
+### pe_repo Setup
+
+Because the Bulk Agent Installer face leverages the built-in Simplified Agent Installer of Puppet Enterprise, it's important that the
+simplified agent installer is setup accordingly. Namely, make sure that your Puppet master has the correct `pe_repo::platform` classes
+applied to it before attempting to run the Bulk Agent Installer.
+
+Documentation for doing this is available here: <https://docs.puppet.com/pe/latest/install_agents.html#install-agents-with-a-different-os-and-architecture-than-the-puppet-master>
+
 ## Simple SSH agent deployment
 
 ```shell
 sudo puppet bulk install unprovisioned-agent1 unprovisioned-agent2  \
---credentials /vagrant/examples/json/sudo_install.json \
---debug
+                 --credentials /vagrant/examples/json/sudo_install.json \
+                 --debug
 ```
 
 This invocation would connect to unprovisioned-agent1 and unprovisioned-agent2
-node and initiate the `curl | bash` installer. The credentials for the ssh
-connection would be contained in the JSON file passed with `--credentials`.
+node and execute the simplified agent installer. The credentials for the ssh
+connection should be contained in the JSON file passed with `--credentials`.
 
 In the event other authentication methods fail, the user will be prompted for the password by the installer libraries.
 This may allow for some systems such as two factor to be used however it likely will
 be cumbersome on large numbers of nodes.
 
-> This may stop an unattended installation waiting for input. Ensure your
-> credentials are correct
+> This may stop an unattended installation waiting for input. Ensure your credentials are correct.
 
 ### Simple SSH agent deployment with nodes file
 
@@ -302,7 +311,6 @@ Regardless if the system running the remote script is a domain member or a stand
 If this is not a desired result, at the completion of the distributed install script execution you can clean out the [Trusted Hosts](https://msdn.microsoft.com/en-us/library/aa384372.aspx) file.  One method to complete this task programmatically is as follows:
 
 [Use PowerShell to clear the Trusted Hosts file](https://blogs.technet.microsoft.com/heyscriptingguy/2013/11/29/powertip-use-powershell-to-clear-the-trusted-hosts-file/)
-
 
 ---
 
