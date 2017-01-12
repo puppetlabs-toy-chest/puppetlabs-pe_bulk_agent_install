@@ -60,7 +60,9 @@ This module ships a Puppet face, `puppet bulk install`. The face can be used wit
 system that supports SSH to allow for the mass installation of Puppet agent nodes using
 the simplified installer bundled with Puppet Enterprise.
 
-See the [Command Line Options](#command-line-options) section for flags that can be passed to the CLI.
+**Example CLI usage** can be found in the **[examples folder](examples/cli_usage)** of this module.
+
+All possible CLI flags can be seen in the [Command Line Options](#command-line-options) section.
 
 For Windows nodes, a separate method that uses a PowerShell script should be used. See [the docs here](#windows).
 
