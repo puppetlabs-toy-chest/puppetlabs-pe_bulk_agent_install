@@ -1,13 +1,13 @@
 {
-  "name": "puppet-pe_bulk_agent_install",
-  "version": "1.0.0",
+  "name": "puppetlabs-pe_bulk_agent_install",
+  "version": "1.0.1",
   "author": "Puppet",
   "summary": "A tool for installing Puppet agents across multiple platforms en masse",
   "description": "Bulk Puppet agent installation tool",
   "license": "Apache-2.0",
-  "source": "https://github.com/puppetlabs/puppet-pe_bulk_agent_install",
-  "project_page": "https://github.com/puppetlabs/puppet-pe_bulk_agent_install",
-  "issues_url": "https://github.com/puppetlabs/puppet-pe_bulk_agent_install/issues",
+  "source": "https://github.com/puppetlabs/puppetlabs-pe_bulk_agent_install",
+  "project_page": "https://github.com/puppetlabs/puppetlabs-pe_bulk_agent_install",
+  "issues_url": "https://github.com/puppetlabs/puppetlabs-pe_bulk_agent_install/issues",
   "requirements": [
     {
       "name": "puppet",
