@@ -99,7 +99,7 @@ sudo puppet bulk install unprovisioned-agent1 unprovisioned-agent2  \
 ```
 
 This invocation would connect to unprovisioned-agent1 and unprovisioned-agent2
-node and execute the simplified agent installer. The credentials for the ssh
+node and execute the simplified agent installer. The credentials for the SSH
 connection should be contained in the JSON file passed with `--credentials`.
 
 In the event other authentication methods fail, the user will be prompted for the password by the installer libraries.
@@ -134,7 +134,7 @@ in via STDIN. I.e. you can ping the nodes and only echo them if they respond.
 ### Multiple thread support
 
 `puppet bulk install` supports a `--threads` argument which defaults to the number of processors on the bastion host times 2.
-You can increase or decrease this to control the load on your masters and bastion host running the ssh sessions.
+You can increase or decrease this to control the load on your masters and bastion host running the SSH sessions.
 
 ## Credentials
 
