@@ -9,8 +9,7 @@ describe "pe_bulk_agent_install::windows::bastion" do
   context "on Windows with custom parameters" do
 
     let(:facts) {{
-      :osfmaily => 'windows',
-      :kernel   => "windows"
+      :os => { :family => 'windows' }
     }}
 
     let(:params) {{
@@ -31,5 +30,20 @@ describe "pe_bulk_agent_install::windows::bastion" do
 
   end
 
+  context "on a non-Windows server" do
+
+    let(:facts) {{
+      :os => { :family => 'RedHat' }
+    }}
+
+    let(:params) {{
+      # Need to set the location to a POSIX path for the spec test to work:
+      # https://github.com/rodjek/rspec-puppet/issues/192
+      :scripts_install_location => '/tmp',
+    }}
+
+    it { should raise_error(/class must only be applied to Windows agents/) }
+
+  end
 end
 

@@ -18,6 +18,10 @@ class pe_bulk_agent_install::windows::bastion (
   String           $scripts_install_location = 'C:/Windows/Temp',
 ) {
 
+  if $facts['os']['family'] != 'windows' {
+    fail('The pe_bulk_agent_install::windows::bastion class must only be applied to Windows agents')
+  }
+
   validate_absolute_path($scripts_install_location)
 
   # Template uses:
