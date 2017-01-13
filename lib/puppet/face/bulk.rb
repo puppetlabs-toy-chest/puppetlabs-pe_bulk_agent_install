@@ -154,10 +154,6 @@ Puppet::Face.define(:bulk, '1.0.0') do
       min_widths = Hash[ *headers.map { |k,v| [k, v.length] }.flatten ]
       min_widths['node_name'] = min_widths['exit_status'] = 40
 
-      min_width = min_widths.inject(0) { |sum,pair| sum += pair.last } + (padding.length * (headers.length - 1))
-
-      terminal_width = [Puppet::Util::Terminal.width, min_width].max
-
       highlight = proc do |color,s|
         c = colorize(color, s)
         c
@@ -171,8 +167,6 @@ Puppet::Face.define(:bulk, '1.0.0') do
             'exit_status' => exit_status.length,
           }
         end
-
-        flex_width = terminal_width - columns['node_name'] - columns['exit_status'] - (padding.length * (headers.length - 1))
 
         format = %w{node_name exit_status}.map do |k|
           "%-#{ [ columns[k], min_widths[k] ].max }s"
