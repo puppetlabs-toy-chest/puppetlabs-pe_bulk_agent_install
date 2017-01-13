@@ -7,4 +7,3 @@ if Puppet.version.to_f >= 4.5
     end
   end
 end
-
