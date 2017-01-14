@@ -82,9 +82,9 @@ Puppet::Face.define(:bulk, '1.0.0') do
       results         = []
       mutex           = Mutex.new
 
-      thread_count.times.map {
-        Thread.new(nodes, completed_nodes, options) do |nodes, completed_nodes, options|
-          while target = mutex.synchronize { nodes.pop }
+      Array.new(thread_count) do
+        Thread.new(nodes, completed_nodes, options) do |nodes_thread, completed_nodes_thread, options_thread|
+          while target == mutex.synchronize { nodes_thread.pop }
             Puppet.notice("Processing target: #{target}")
             begin
               node = Chloride::Host.new(target, @config)
@@ -97,11 +97,11 @@ Puppet::Face.define(:bulk, '1.0.0') do
               # Allow user to pass in -s arguments as hash and reformat for
               # bash to parse them via the -s, such as the csr_attributes
               # custom_attributes:challengePassword=S3cr3tP@ssw0rd
-              bash_arguments = @config[:arguments].map { |k, v| "#{v.map { |_k, _v| '%s:%s=%s' % [k, _k, _v] }.join(' ')}" }.unshift('-s').join(' ') unless @config[:arguments].nil?
+              bash_arguments = @config[:arguments].map { |k, v| v.map { |subkey, subvalue| format('%s:%s=%s', k, subkey, subvalue) }.join(' ').to_s }.unshift('-s').join(' ') unless @config[:arguments].nil?
               install = Chloride::Action::Execute.new(
                 host: node,
                 sudo: use_sudo,
-                cmd:  "bash -c \"curl -k https://#{@config[:master]}:8140/packages/current/#{options[:script]} | bash #{bash_arguments}\""
+                cmd:  "bash -c \"curl -k https://#{@config[:master]}:8140/packages/current/#{options_thread[:script]} | bash #{bash_arguments}\""
               )
               install.go do |event|
                 event.data[:messages].each do |data|
@@ -115,8 +115,8 @@ Puppet::Face.define(:bulk, '1.0.0') do
                     # the curl separately and then the install in later
                     # versions of this code to catch curl errors better
                     curl_errors = [
-                      /Could not resolve host:.*; Name or service not known/,
-                      /^.*curl.*(E|e)rror/
+                      %r{Could not resolve host:.*; Name or service not known},
+                      %r{^.*curl.*(E|e)rror}
                     ]
                     re = Regexp.union(curl_errors)
                     severity = data.message.match(re) ? :err : data.severity
@@ -125,9 +125,9 @@ Puppet::Face.define(:bulk, '1.0.0') do
                 end
               end
               if install.success?
-                mutex.synchronize { completed_nodes << Hash[target => install.results[target][:exit_status]] }
+                mutex.synchronize { completed_nodes_thread << Hash[target => install.results[target][:exit_status]] }
               else
-                mutex.synchronize { failed_nodes    << Hash[target => install.results[target][:exit_status]] }
+                mutex.synchronize { failed_nodes << Hash[target => install.results[target][:exit_status]] }
                 Puppet.err "Node: #{target} failed"
               end
             rescue => e
@@ -136,7 +136,7 @@ Puppet::Face.define(:bulk, '1.0.0') do
             end
           end
         end
-      }.each(&:join)
+      end.each(&:join)
       results << completed_nodes
       results << failed_nodes
       results.flatten
@@ -158,23 +158,24 @@ Puppet::Face.define(:bulk, '1.0.0') do
         c
       end
       n = 0
-      output.collect do |results|
-        columns = results.inject(min_widths) do |node_name, exit_status|
+      output.map do |results|
+        columns = results.reduce(min_widths) do |node_name, exit_status|
           {
             'node_name'   => node_name.length,
             'exit_status' => exit_status.length
           }
         end
 
-        format = %w[node_name exit_status].map do |k|
+        format_string = %w(node_name exit_status).map do |k|
           "%-#{[columns[k], min_widths[k]].max}s"
         end.join(padding)
+
         results.map do |node_name, exit_status|
           n += 1
           if n.odd?
-            highlight[:hwhite, format % [node_name, exit_status]]
+            highlight[:hwhite, format(format_string, node_name, exit_status)]
           else
-            highlight[:white, format % [node_name, exit_status]]
+            highlight[:white, format(format_string, node_name, exit_status)]
           end
         end.join
       end
