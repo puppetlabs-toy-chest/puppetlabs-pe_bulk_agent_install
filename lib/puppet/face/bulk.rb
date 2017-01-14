@@ -84,7 +84,8 @@ Puppet::Face.define(:bulk, '1.0.0') do
 
       Array.new(thread_count) do
         Thread.new(nodes, completed_nodes, options) do |nodes_thread, completed_nodes_thread, options_thread|
-          while target == mutex.synchronize { nodes_thread.pop }
+          target = mutex.synchronize { nodes_thread.pop }
+          while target
             Puppet.notice("Processing target: #{target}")
             begin
               node = Chloride::Host.new(target, @config)
