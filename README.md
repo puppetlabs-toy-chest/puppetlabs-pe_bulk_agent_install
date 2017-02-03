@@ -1,5 +1,8 @@
 # PE Bulk Agent Install
 
+[![Puppet Forge](https://img.shields.io/puppetforge/v/puppetlabs/pe_bulk_agent_install.svg)](https://forge.puppetlabs.com/puppetlabs/pe_bulk_agent_install)
+[![Puppet Forge - downloads](https://img.shields.io/puppetforge/dt/puppetlabs/pe_bulk_agent_install.svg)](https://forge.puppetlabs.com/puppetlabs/pe_bulk_agent_install)
+
 Puppet toolkit for rapidly installing Puppet agents in Puppet Enterprise
 
 ## Table of Contents
