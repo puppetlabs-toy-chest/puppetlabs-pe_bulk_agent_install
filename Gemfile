@@ -12,8 +12,7 @@ group :test do
   gem 'simplecov',                          :require => false
   gem 'parallel_tests', '< 2.10.0',         :require => false if Gem::Version.new(RUBY_VERSION.dup) < Gem::Version.new('2.0.0')
   gem 'parallel_tests',                     :require => false if Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.0.0')
-  gem 'rubocop', '0.41.2',                  :require => false if Gem::Version.new(RUBY_VERSION.dup) < Gem::Version.new('2.0.0')
-  gem 'rubocop',                            :require => false if Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.0.0')
+  gem 'rubocop', '0.46.0',                  :require => false if Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.0.0')
   gem 'rubocop-rspec', '~> 1.9.0',          :require => false if Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.1.0')
   gem 'pry',                                :require => false
   gem 'json_pure', '<= 2.0.1',              :require => false if Gem::Version.new(RUBY_VERSION.dup) < Gem::Version.new('2.0.0')
