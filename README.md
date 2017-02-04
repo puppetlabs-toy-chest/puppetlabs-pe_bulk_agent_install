@@ -1,5 +1,7 @@
 # PE Bulk Agent Install
 
+[![License](https://img.shields.io/github/license/puppetlabs/puppetlabs-pe_bulk_agent_install.svg)](https://github.com/puppetlabs/puppetlabs-pe_bulk_agent_install/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-pe_bulk_agent_install.png?branch=master)](https://travis-ci.org/puppetlabs/puppetlabs-pe_bulk_agent_install)
 [![Puppet Forge](https://img.shields.io/puppetforge/v/puppetlabs/pe_bulk_agent_install.svg)](https://forge.puppetlabs.com/puppetlabs/pe_bulk_agent_install)
 [![Puppet Forge - downloads](https://img.shields.io/puppetforge/dt/puppetlabs/pe_bulk_agent_install.svg)](https://forge.puppetlabs.com/puppetlabs/pe_bulk_agent_install)
 
