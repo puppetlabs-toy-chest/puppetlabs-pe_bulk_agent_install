@@ -1,5 +1,8 @@
 # PE Bulk Agent Install
 
+[![Puppet Forge](https://img.shields.io/puppetforge/v/puppetlabs/pe_bulk_agent_install.svg)](https://forge.puppetlabs.com/puppetlabs/pe_bulk_agent_install)
+[![Puppet Forge - downloads](https://img.shields.io/puppetforge/dt/puppetlabs/pe_bulk_agent_install.svg)](https://forge.puppetlabs.com/puppetlabs/pe_bulk_agent_install)
+
 Puppet toolkit for rapidly installing Puppet agents in Puppet Enterprise
 
 ## Table of Contents
@@ -60,7 +63,7 @@ This module ships a Puppet face, `puppet bulk install`. The face can be used wit
 system that supports SSH to allow for the mass installation of Puppet agent nodes using
 the simplified installer bundled with Puppet Enterprise.
 
-**Example CLI usage** can be found in the **[examples folder](examples/cli_usage)** of this module.
+**Example CLI usage** can be found in the [examples folder](https://github.com/puppetlabs/puppetlabs-pe_bulk_agent_install/tree/master/examples/cli_usage) of this module.
 
 All possible CLI flags can be seen in the [Command Line Options](#command-line-options) section.
 
