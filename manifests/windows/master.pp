@@ -11,9 +11,11 @@
 # ----------
 #
 # @param public_dir [String] The directory on the master to put the install.ps1 script. Defaults to '/opt/puppetlabs/server/data/packages/public'.
+# @param install_chloride [Boolean] Wether or not to manage the required gems (chloride). Defaults to true
 #
 class pe_bulk_agent_install::windows::master (
-  $public_dir = '/opt/puppetlabs/server/data/packages/public',
+  String  $public_dir       = '/opt/puppetlabs/server/data/packages/public',
+  Boolean $install_chloride = true,
 ) {
 
   validate_absolute_path($public_dir)
@@ -22,7 +24,7 @@ class pe_bulk_agent_install::windows::master (
   # We are wrapping this entire thing in an if ! defined() to prevent our version from being
   # used if pe_repo tries to make it.
   # This logic isn't fool proof because it's based on parse order, but it's close enough.
-  if ! defined(File["${public_dir}/${::pe_server_version}/install.ps1"]) {
+  if ! defined(File["${public_dir}/${$facts['pe_server_version']}/install.ps1"]) {
 
     require pe_repo
 
@@ -34,6 +36,10 @@ class pe_bulk_agent_install::windows::master (
       content => template("${module_name}/install.ps1.erb"),
     }
 
+  }
+
+  if $install_chloride {
+    include pe_bulk_agent_install::chloride
   }
 
 }
