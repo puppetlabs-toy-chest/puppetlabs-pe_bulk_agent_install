@@ -18,18 +18,18 @@ Puppet toolkit for rapidly installing Puppet agents in Puppet Enterprise
   * [Simple SSH agent deployment with nodes STDIN](#simple-ssh-agent-deployment-with-nodes-stdin)
   * [Multiple thread support](#multiple-thread-support)
 * [Credentials](#credentials)
-  * [Sudo \+ Password Credentials](#sudo--password-credentials)
-  * [Sudo \+ Private key Credentials](#sudo--private-key-credentials)
-  * [Private key Credentials \+ no password](#private-key-credentials--no-password)
-  * [Private key Credentials \+ password](#private-key-credentials--password)
-  * [Extras](#extras)
+  * [Sudo \+ Password](#sudo--password)
+  * [Sudo \+ Private key w/ no passphrase](#sudo--private-key-w-no-passphrase)
+  * [Root \+ Private key w/ no passphrase](#root--private-key-w-no-passphrase)
+  * [Root \+ Private key w/ passphrase](#root--private-key-w-passphrase)
+  * [Puppet Config Arguments and CSR Attributes](#puppet-config-arguments-and-csr-attributes)
 * [Fixing DNS and NTP on agent nodes](#fixing-dns-and-ntp-on-agent-nodes)
 * [Windows](#windows)
   * [Setup](#setup)
   * [Usage](#usage)
     * [Single\-agent](#single-agent)
     * [Pass Windows credentials](#pass-windows-credentials)
-    * [Multiple agents (using nodes\.txt)](#multiple-agents-using-nodestxt)
+    * [Multiple agents (using agents\.txt)](#multiple-agents-using-agentstxt)
     * [Multiple agents (using provided file)](#multiple-agents-using-provided-file)
   * [Caveats](#caveats)
     * [Domain Member vs Standalone System](#domain-member-vs-standalone-system)
@@ -108,7 +108,7 @@ Documentation for doing this is available here: <https://docs.puppet.com/pe/late
 
 ```shell
 sudo puppet bulk install unprovisioned-agent1 unprovisioned-agent2  \
-                 --credentials /vagrant/examples/json/sudo_install.json \
+                 --credentials ./examples/json/sudo_install.json \
                  --debug
 ```
 
@@ -126,8 +126,8 @@ be cumbersome on large numbers of nodes.
 
 ```shell
 sudo puppet bulk install \
---nodes /vagrant/examples/el_nodes.txt \
---credentials /vagrant/examples/json/sudo_install.json --trace --debug
+--nodes ./examples/el_nodes.txt \
+--credentials ./examples/json/sudo_install.json --trace --debug
 ```
 
 This assumes a file that contains node names with newline character separating each
@@ -139,7 +139,7 @@ This assumes a file that contains node names with newline character separating e
 printf '%s\n%s\n%s\n' unprovisioned-agent1 unprovisioned-agent2 unprovisioned-agent4 |
 sudo puppet bulk install \
 --nodes - \
---credentials /vagrant/examples/json/sudo_install.json --trace --debug
+--credentials ./examples/json/sudo_install.json --trace --debug
 ```
 
 You can build your own custom scripts to add agent nodes to the install list and pass them
@@ -152,23 +152,53 @@ You can increase or decrease this to control the load on your masters and bastio
 
 ## Credentials
 
-Credentials for the nodes can be specified in the json file, options for passing them in are not supplied for security reasons.
+Authentication credentials must be specified as a JSON hash and passed in a file to `--credentials`:
 
-### Sudo + Password Credentials
+```shell
+puppet bulk install --credentials bulk_install.json
+```
+
+By default, a credentials file named `bulk_install.json` is looked for and parsed if `--credentials` is not used.
+
+The credentials JSON must be a hash containing the following keys:
+
+|  Key Name          |                                Description                                 |
+|:-------------------|:---------------------------------------------------------------------------|
+| username           | **(required)** Username for the SSH connection to the agent                |
+| master             | **(required)** FQDN of the Puppet master                                   |
+| sudo\_password     | Password used for SSH login and sudo escalation                            |
+| ssh\_key\_file     | Path to SSH private key if using key-based auth                            |
+| ssh\_key\_password | SSH passphrase for the private key                                         |
+| arguments          | Hash of Puppet configs, CSR attributes, and/or extension requestss         |
+
+### Sudo + Password
 
 ```json
 {
-  "username": "vagrant",
-  "sudo_password": "vagrant",
+  "username": "provisioner",
+  "sudo_password": "p_4_s_s_w_0_r_d",
   "master" : "pe-201620-master"
 }
 ```
 
-This file assume a user with sudo access on the target agent system. The master pe-201620-master will be used to curl the installer from.
-This hostname must be reachable by the agent node as it is use in the yum/apt repos no matter what is passed at this step. Ensure your site has
-proper DNS or /etc/hosts entries configured for the Puppet Master.
+This assumes a user named `provisioner` with sudo access exists on the target agent system. The agent node will run the Simplified
+Agent Installer from the Puppet master named pe-201620-master. The master's hostname must be resolvable and reachable by the agent node as
+it is used in the yum/apt repos. Ensure your site has proper DNS or /etc/hosts entries configured for the Puppet master.
 
-### Sudo + Private key Credentials
+### Sudo + Private key w/ no passphrase
+
+```json
+{
+  "username": "provisioner",
+  "ssh_key_file": "/root/.ssh/id_rsa",
+  "master" : "pe-201620-master"
+}
+```
+
+This assumes a private key is installed and readable on the machine running the CLI (with no passphrase set), and that it corresponds
+to an authorized\_key file on the target host using the username `provisioner` (who has sudo access that doesn't require a password).
+
+### Root + Private key w/ no passphrase
 
 ```json
 {
@@ -178,50 +208,44 @@ proper DNS or /etc/hosts entries configured for the Puppet Master.
 }
 ```
 
-This file assumes a private key is installed and readable on the box running the CLI, and that it corresponds to an authorized_key file on the target host
-using the username root.
+This assumes a private key is installed and readable on the machine running the CLI (with no passphrase set), and that the key
+corresponds to an authorized\_key file on the target agent using the username root.
 
-### Private key Credentials + no password
-
-```json
-{
-  "username": "bob",
-  "ssh_key_file": "/root/.ssh/id_rsa",
-  "master" : "pe-201620-master"
-}
-```
-
-This file assumes a private key is installed and readable on the box running the CLI ( with no password set), and that it corresponds to an authorized_key file on the target host
-using the username bob (who has sudo access).
-
-### Private key Credentials + password
+### Root + Private key w/ passphrase
 
 ```json
 {
-  "username": "bob",
+  "username": "root",
   "ssh_key_file": "/root/.ssh/id_rsa",
   "ssh_key_passphrase": "freyjaIscute",
   "master" : "pe-201620-master"
 }
 ```
 
-This file assumes a private key is installed and readable on the box running the CLI ( with a password set), and that it corresponds to an authorized_key file on the target host
-using the username bob (who has sudo access).
+This assumes a private key is installed and readable on the machine running the CLI (with a passphrase set), and that it corresponds
+to an authorized\_key file on the target host using the username root.
 
-### Extras
+### Puppet Config Arguments and CSR Attributes
 
 ```json
 {
-  "username": "vagrant",
-  "ssh_key_file": "/vagrant/examples/vagrant.rsa",
+  "username": "root",
+  "ssh_key_file": "/root/.ssh/id_rsa",
   "master" : "pe-201620-master",
   "arguments" :
-    {"agent": { "environment": "development" }}
+    {
+      "agent": { "environment": "development" },
+      "custom_attributes": { "challengePassword": "imyourpuppet" },
+      "extension_requests": { "pp_role": "gitlab_runner" }
+    }
 }
 ```
 
-Using the arguments key of the json file, you can specify csr_attributes and puppet.conf settings. This allows for you to pass them in at installation time and will be passed
-to the bash installer as `section:key=value` arguments to `-s`
+Using the arguments key of the json file, you can specify puppet.conf settings, CSR attributes, and extension requests. They will be passed to the bash installer as arguments to `-s`.
+
+Refer to the Puppet Enterprise install script docs on possible options that can be specified here:
+
+<https://docs.puppet.com/pe/2016.5/install_agents.html#passing-configuration-parameters-to-the-install-script>
 
 ## Fixing DNS and NTP on agent nodes
 
@@ -322,7 +346,7 @@ Placing the FQDN of each of the respective agents in a file of your choosing the
 
 Regardless if the system running the remote script is a domain member or a standalone system, an entry for the each remote system will be created in the [Trusted Hosts](https://msdn.microsoft.com/en-us/library/aa384372.aspx) file.
 
-If this is not a desired result, at the completion of the distributed install script execution you can clean out the [Trusted Hosts](https://msdn.microsoft.com/en-us/library/aa384372.aspx) file.  One method to complete this task programmatically is as follows:
+If this is not a desired result, at the completion of the distributed install script execution you can clean out the [Trusted Hosts](https://msdn.microsoft.com/en-us/library/aa384372.aspx) file. One method to complete this task programmatically is as follows:
 
 [Use PowerShell to clear the Trusted Hosts file](https://blogs.technet.microsoft.com/heyscriptingguy/2013/11/29/powertip-use-powershell-to-clear-the-trusted-hosts-file/)
 
