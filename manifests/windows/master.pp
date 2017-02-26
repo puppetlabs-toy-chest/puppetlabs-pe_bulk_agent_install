@@ -18,6 +18,10 @@ class pe_bulk_agent_install::windows::master (
   Boolean $install_chloride = true,
 ) {
 
+  if $facts['pe_server_version'] == undef {
+    fail("The ${module_name}::windows::master class should only be applied to a Puppet Master")
+  }
+
   validate_absolute_path($public_dir)
 
   # In PE 2016.3.x and higher, the pe_repo module has its own version of this file.
