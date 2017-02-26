@@ -14,6 +14,10 @@ describe 'pe_bulk_agent_install::windows::master' do
 
       context 'with default parameters' do
         it { is_expected.to compile }
+
+        it { is_expected.to contain_file('/opt/puppetlabs/server/data/packages/public/2015.2.3/install.ps1').with_content(%r{^\$server\s+=\s+'puppet'$})  }
+        it { is_expected.to contain_file('/opt/puppetlabs/server/data/packages/public/2015.2.3/install.ps1').with_content(%r{^\$port\s+=\s+'8140'$})  }
+
         it { is_expected.to contain_class('pe_bulk_agent_install::chloride') }
       end
 
