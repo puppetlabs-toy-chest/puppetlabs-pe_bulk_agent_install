@@ -12,7 +12,7 @@ Puppet toolkit for rapidly installing Puppet agents in Puppet Enterprise
 * [Overview](#overview)
 * [Module State](#module-state)
 * [Command Line Usage](#command-line-usage)
-* [Installation](#installation)
+* [Installation Requirements](#installation-requirements)
 * [Simple SSH agent deployment](#simple-ssh-agent-deployment)
   * [Simple SSH agent deployment with nodes file](#simple-ssh-agent-deployment-with-nodes-file)
   * [Simple SSH agent deployment with nodes STDIN](#simple-ssh-agent-deployment-with-nodes-stdin)
@@ -71,32 +71,31 @@ All possible CLI flags can be seen in the [Command Line Options](#command-line-o
 
 For Windows nodes, a separate method that uses a PowerShell script should be used. See [the docs here](#windows).
 
-## Installation
+## Installation Requirements
+
+### Chloride Gem
 
 The Puppet face requires the [chloride](https://rubygems.org/gems/chloride) gem to be in place in the Puppet ruby stack (not puppetserver)
 of the node that will be executing the Puppet face. This could be your Puppet master or some other Puppet agent that is able to connect
 to the soon-to-be Puppet agents.
 
-Install the gem manually with the following shell command:
+Install Chloride using one of these methods:
 
-```shell
-/opt/puppetlabs/puppet/bin/gem install chloride --no-ri --no-rdoc
-```
+* Automatically, with Puppet:
 
-> Future versions of Puppet Enterprise will likely ship with this gem see: [PE-17084](https://tickets.puppetlabs.com/browse/PE-17084)
+  ```puppet
+  include pe_bulk_agent_install::chloride
+  ```
 
-The gem can also be installed via Puppet with the following code:
+* Manually, into Puppet's Ruby stack:
 
-```puppet
-package {'chloride':
-  ensure   => 'present',
-  provider => 'puppet_gem',
-}
-```
+  ```shell
+  /opt/puppetlabs/puppet/bin/gem install chloride --no-ri --no-rdoc
+  ```
 
-> This should be incorporated into this module at a later date
+> Future versions of Puppet Enterprise (2017'ish) will likely ship with Chloride built-in to Puppet's Ruby stack on the master.
 
-### pe_repo Setup
+### pe_repo
 
 Because the Bulk Agent Installer face leverages the built-in Simplified Agent Installer of Puppet Enterprise, it's important that the
 simplified agent installer is setup accordingly. Namely, make sure that your Puppet master has the correct `pe_repo::platform` classes
