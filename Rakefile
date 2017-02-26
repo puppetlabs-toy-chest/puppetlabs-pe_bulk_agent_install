@@ -11,6 +11,5 @@ PuppetLint.configuration.send('disable_140chars')
 desc 'Run the metadata_lint and release_checks tests'
 task test: [
   :metadata_lint,
-  :release_checks,
+  :release_checks
 ]
-
