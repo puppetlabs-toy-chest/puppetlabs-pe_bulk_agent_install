@@ -251,8 +251,12 @@ Refer to the Puppet Enterprise install script docs on possible options that can 
 Ideally your environment will have correct DNS and Time synchronized ahead of
 the Puppet Enterprise installation by way of your preseed/kickstart/sysprep
 provisioning process. In the event that you need to update this information,
-you can have the bulk install tool copy a script to the agent and execute it
+you can have the bulk install tool download a script to the agent and execute it
 before installing Puppet. That script could setup DNS and NTP.
+
+The script will be downloaded from the master, from the same directory as the
+install.bash script used by the normal simplified agent installer.  (By
+default, /opt/puppetlabs/server/data/packages/public/current on the master.)
 
 Use the `--script` option of the CLI to do this as shown below.
 
@@ -357,11 +361,15 @@ If this is not a desired result, at the completion of the distributed install sc
 
 The bulk installer face accepts options from the command line as shown below.
 
-#### `--credentials=`
+#### `--credentials`
 
 The relative or absolute path to a JSON file containing the credentials information.
 
 * Default: `bulk_install.json`
+
+#### `--debug`
+
+Output additional messages to assist in debugging.
 
 #### `--sudo`
 
@@ -369,19 +377,23 @@ A boolean flag that specifies weather or not to run the installation scripts wit
 
 Sudo is automatically used if the credentials hash contains a `sudo_password` key or a non root username.
 
-#### `--threads=`
+#### `--threads`
 
 The number of threads to use for concurrent agent installations.
 
 * Default: Number of processors times 2.
 
-#### `--script=`
+#### `--trace`
+
+Output additional log messages, beyond what debug does.
+
+#### `--script`
 
 The name of the Puppet Enterprise agent installation script to run by default.
 
 * Default: `install.bash`
 
-#### `--nodes=`
+#### `--nodes`
 
 The relative or absolute path to a new line separated file containing node names to install Puppet on.
 
