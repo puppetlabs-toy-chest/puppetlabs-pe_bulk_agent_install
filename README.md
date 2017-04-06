@@ -38,7 +38,6 @@ Puppet toolkit for rapidly installing Puppet agents in Puppet Enterprise
   * [Class Usage](#class-usage)
     * [pe\_bulk\_agent\_install::windows::bastion](#pe_bulk_agent_installwindowsbastion)
   * [WinRM Script Arguments](#winrm-script-arguments)
-* [Limitations](#limitations)
 * [Maintainers](#maintainers)
 
 ---
