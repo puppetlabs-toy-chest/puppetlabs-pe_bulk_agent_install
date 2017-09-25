@@ -28,7 +28,7 @@ class pe_bulk_agent_install::windows::master (
   # We are wrapping this entire thing in an if ! defined() to prevent our version from being
   # used if pe_repo tries to make it.
   # This logic isn't fool proof because it's based on parse order, but it's close enough.
-  if ! defined(File["${public_dir}/${$facts['pe_server_version']}/install.ps1"]) {
+  if ! defined(File["${public_dir}/${facts['pe_server_version']}/install.ps1"]) {
 
     require pe_repo
 
