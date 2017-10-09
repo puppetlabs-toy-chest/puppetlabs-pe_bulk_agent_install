@@ -135,6 +135,7 @@ Puppet::Face.define(:bulk, '1.0.0') do
               Puppet.err("target:#{target} error:#{e}")
               mutex.synchronize { failed_nodes << Hash[target => e.to_s] }
             end
+            target = mutex.synchronize { nodes_thread.pop }
           end
         end
       end.each(&:join)
