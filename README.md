@@ -326,9 +326,9 @@ Credentials associated with a Windows user account.
 .\Invoke-PuppetAgentInstall.ps1 -Credential MYDOMAIN\Administrator -PMHostname master.puppet.vm
 ```
 
-#### Multiple agents (using agents.txt)
+#### Multiple agents (using nodes.txt)
 
-Placing the FQDN of each of the respective agents in a file called `agents.txt` in the same directory as the script.
+Placing the FQDN of each of the respective agents in a file called `nodes.txt` in the same directory as the script.
 
 ```PowerShell
 .\Invoke-PuppetAgentInstall.ps1 -PMHostname master.puppet.vm
