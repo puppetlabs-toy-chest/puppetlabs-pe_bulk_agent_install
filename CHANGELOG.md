@@ -1,5 +1,12 @@
 # Change Log
 
+## [v1.1.1](https://github.com/puppetlabs/puppetlabs-pe_bulk_agent_install/tree/v1.1.1) (2017-10-12)
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_bulk_agent_install/compare/v1.1.0...v1.1.1)
+
+**Merged pull requests:**
+
+- Fixed hanging agent installs [\#13](hthps://github.com/puppetlabs/puppetlabs-pe_bulk_agent_install/pull/13)
+
 ## [v1.1.0](https://github.com/puppetlabs/puppetlabs-pe_bulk_agent_install/tree/v1.1.0) (2017-02-26)
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_bulk_agent_install/compare/v1.0.0...v1.1.0)
 

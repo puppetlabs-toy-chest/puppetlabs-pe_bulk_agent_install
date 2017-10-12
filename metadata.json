@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-pe_bulk_agent_install",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "Puppet",
   "summary": "A tool for installing Puppet agents across multiple platforms en masse",
   "description": "Bulk Puppet agent installation tool",
